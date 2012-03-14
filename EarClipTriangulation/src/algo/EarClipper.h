@@ -5,13 +5,13 @@
 #include <utility>
 #include <vector>
 #include <iostream>
-#include "src/algo/Graph.h"
-#include "src/algo/Vector2D.h"
+#include "src/objects/Graph.h"
+#include "src/objects/Vector2D.h"
+#include "src/objects/Triangle2D.h"
 
-//fabric, actually.
 class EarClipper {
 public:
-    static Graph triangulate (const Graph& arg);
+    static Graph <Point2D> triangulate (const Graph <Point2D> &arg, std::vector <Triangle2D> *triangles = 0);
 };
 
 #endif // EARCLIPPER_H

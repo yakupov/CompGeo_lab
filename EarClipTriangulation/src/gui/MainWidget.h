@@ -1,11 +1,15 @@
 #ifndef MAINWIDGET_H
 #define	MAINWIDGET_H
 
+#include <iostream>
 #include <QWidget>
 #include <QLayout>
 #include <QPushButton>
+#include "src/algo/PolygonInputParser.h"
+#include "src/algo/EarClipper.h"
 #include "src/gui/Drawer.h"
-#include "src/algo/Graph.h"
+#include "src/objects/Graph.h"
+#include "src/objects/Triangle2D.h"
 
 class MainWidget : public QWidget {
     Q_OBJECT

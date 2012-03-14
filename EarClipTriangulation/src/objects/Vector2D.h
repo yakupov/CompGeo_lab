@@ -1,7 +1,7 @@
 #ifndef VECTOR2D_H
 #define VECTOR2D_H
 
-#include "src/algo/Point2D.h"
+#include "src/objects/Point2D.h"
 
 class Vector2D {
 public:

@@ -5,7 +5,7 @@ Drawer::Drawer(QWidget *parent) :
 }
 
 
-Drawer::Drawer(QWidget *parent, const Graph& poly) :
+Drawer::Drawer(QWidget *parent, const Graph <Point2D> & poly) :
     QWidget (parent),
     poly (poly) {
 }
@@ -68,7 +68,7 @@ void Drawer::paintEvent(QPaintEvent *event) {
 }
 
 
-void Drawer::replacePoly(const Graph &poly) {
+void Drawer::replacePoly(const Graph <Point2D> &poly) {
     this->poly = poly;
     this->repaint();
 }

@@ -7,8 +7,8 @@
 #include <QWidget>
 #include <QPainter>
 #include <QFont>
-#include "src/algo/Graph.h"
-#include "src/algo/EarClipper.h"
+#include "src/objects/Graph.h"
+#include "src/objects/Point2D.h"
 
 
 class Drawer : public QWidget {
@@ -16,13 +16,13 @@ class Drawer : public QWidget {
 
 public:
     Drawer(QWidget *parent = 0);
-    Drawer(QWidget *parent, const Graph& poly);
+    Drawer(QWidget *parent, const Graph <Point2D> &poly);
 
     void paintEvent(QPaintEvent *event);
-    void replacePoly (const Graph& poly);
+    void replacePoly (const Graph <Point2D> &poly);
 
 protected:
-    Graph poly;
+    Graph <Point2D> poly;
 };
 
 #endif // DRAWER_H

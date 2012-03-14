@@ -1,7 +1,7 @@
 #include "EarClipper.h"
 
-Graph EarClipper::triangulate(const Graph &arg) {
-    Graph result (arg);
+Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector <Triangle2D> *triangles) {
+    Graph <Point2D> result (arg);
     std::vector<bool> cutOff (arg.getVertexCount(), false);
     int vertexRemaining = arg.getVertexCount();
 
@@ -58,6 +58,9 @@ Graph EarClipper::triangulate(const Graph &arg) {
             --vertexRemaining;
             cutOff[b] = true;
             result.addEdge(a, c);
+            if (triangles != 0) {
+                triangles->push_back(Triangle2D(arg.getVertex(a), arg.getVertex(b), arg.getVertex(c)));
+            }
             //std::cout << a << ' ' << c << " - edge added\n";
         } else {
             ++a;

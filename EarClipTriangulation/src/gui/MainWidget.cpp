@@ -16,7 +16,8 @@ MainWidget::MainWidget()
     QObject::connect(&processButton, SIGNAL(clicked()), this, SLOT(clickedProcessButton()));
 
 
-    Graph g ("input.txt");
+    Graph <Point2D> g (PolygonInputParser::parseFile("input.txt"));
+    g.connectVertices();
     visualizer.replacePoly(g);
 }
 
@@ -27,6 +28,14 @@ void MainWidget::clickedExitButton() {
 
 
 void MainWidget::clickedProcessButton() {
-    Graph g ("input.txt");
-    visualizer.replacePoly(EarClipper::triangulate(g));
+    Graph <Point2D> g (PolygonInputParser::parseFile("input.txt"));
+    g.connectVertices();
+    std::vector <Triangle2D> triangles;
+    visualizer.replacePoly(EarClipper::triangulate(g, &triangles));
+
+    for (unsigned int i = 0; i < triangles.size(); ++i) {
+        std::cout << triangles[i].getA().getX() << ' ' << triangles[i].getA().getY() << '\t';
+        std::cout << triangles[i].getB().getX() << ' ' << triangles[i].getB().getY() << '\t';
+        std::cout << triangles[i].getC().getX() << ' ' << triangles[i].getC().getY() << std::endl;
+    }
 }
