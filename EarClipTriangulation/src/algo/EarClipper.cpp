@@ -36,6 +36,11 @@ Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector 
 
         if (va.orientation(vb) > 0) {
             ++a;
+            a = a % arg.getVertexCount(); //cycle vertexes
+            while (cutOff[a]) {
+                ++a;
+                a = a % arg.getVertexCount(); //cycle vertexes
+            }
             continue;
         }
 
@@ -44,12 +49,15 @@ Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector 
                 continue;
             }
 
-            Vector2D va(arg.getVertex(a), arg.getVertex(i));
-            Vector2D vb(arg.getVertex(i), arg.getVertex(c));
+            Vector2D vai(arg.getVertex(a), arg.getVertex(i));
+            Vector2D vic(arg.getVertex(i), arg.getVertex(c));
+            Vector2D vib(arg.getVertex(i), arg.getVertex(b));
+            Vector2D vci(arg.getVertex(c), arg.getVertex(i));
 
-            if (va.orientation(vb) < 0) {
+
+            if (vai.orientation(vic) < 0 && vai.orientation(vib) > 0 && vci.orientation(vib) < 0) {
                 isEar = false;
-                //std::cout << a << ' ' << b << ' ' << c << ' ' << i << " - not ear\n";
+                std::cout << a << ' ' << b << ' ' << c << ' ' << i << " - not ear\n";
                 break;
             }
         }
@@ -61,9 +69,14 @@ Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector 
             if (triangles != 0) {
                 triangles->push_back(Triangle2D(arg.getVertex(a), arg.getVertex(b), arg.getVertex(c)));
             }
-            //std::cout << a << ' ' << c << " - edge added\n";
+            std::cout << a << ' ' << c << " - edge added\n";
         } else {
             ++a;
+            a = a % arg.getVertexCount();
+            while (cutOff[a]) {
+                ++a;
+                a = a % arg.getVertexCount(); //cycle vertexes
+            }
         }
     }
 
