@@ -1,10 +1,13 @@
 #ifndef MAINWIDGET_H
 #define	MAINWIDGET_H
 
+#include <string>
 #include <iostream>
 #include <QWidget>
 #include <QLayout>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QTabWidget>
 #include "src/algo/PolygonInputParser.h"
 #include "src/algo/EarClipper.h"
 #include "src/gui/Drawer.h"
@@ -15,20 +18,36 @@ class MainWidget : public QWidget {
     Q_OBJECT
     
 protected:
-    QGridLayout mainLay;
+    QTabWidget tabs;
+    QWidget controlWidget;
 
+    QGridLayout mainLay;
+    QGridLayout controlWidgetLay;
+
+    QPushButton clearButton;
     QPushButton exitButton;
+    QPushButton exportButton;
+    QPushButton importFromFileButton;
     QPushButton processButton;
+
+    QLineEdit fileNameExport;
+    QLineEdit fileNameInput;
 
     Drawer visualizer;
 
+    Graph<Point2D> poly;
+
 public:
     MainWidget();
-    //~MainWidget();
     
 public slots:
+    void addPoint (Point2D);
+    void clickedClearButton();
     void clickedExitButton();
+    void clickedExportButton();
+    void clickedImportFromFileButton();
     void clickedProcessButton();
+    void removePoint (unsigned int);
 
 signals:
     void performExitButtonAction();

@@ -1,6 +1,7 @@
 #ifndef POLYGONINPUTPARSER_H
 #define POLYGONINPUTPARSER_H
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -12,6 +13,10 @@ public:
         std::vector <Point2D> output;
 
         std::ifstream inp (fileName.c_str());
+        if (inp.fail()) {
+            std::cerr << "can't open input file: " << fileName << std::endl;
+            return output;
+        }
 
         while (inp.peek() != EOF) {
             int x, y;
@@ -21,6 +26,7 @@ public:
         }
 
         output.pop_back();
+        inp.close();
         return output;
     }
 };
