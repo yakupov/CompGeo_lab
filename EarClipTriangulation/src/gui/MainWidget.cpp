@@ -3,11 +3,11 @@
 MainWidget::MainWidget()
     :   clearButton ("Clear graph"),
         exitButton ("Exit"),
-        exportButton ("Export poly to:"),
-        importFromFileButton ("Import poly from file:"),
+        exportToFileButton ("Export poly to file"),
+        importFromFileButton ("Import poly from file"),
         processButton ("Triangulate"),
-        fileNameExport ("output.txt"),
-        fileNameInput ("input.txt"),
+        showOpenFileDialogButton ("Select file"),
+        selectedFileName ("input.txt"),
         visualizer (this) {
 
     tabs.addTab(&visualizer, "Visualizer");
@@ -16,13 +16,17 @@ MainWidget::MainWidget()
     mainLay.addWidget(&controlWidget, 0, 1);
     this->setLayout(&mainLay);
 
-    controlWidgetLay.addWidget(&importFromFileButton, 0, 0);
-    controlWidgetLay.addWidget(&fileNameInput, 1, 0);
-    controlWidgetLay.addWidget(&processButton, 2, 0);
-    controlWidgetLay.addWidget(&clearButton, 3, 0);
-    controlWidgetLay.addWidget(&exportButton, 4, 0);
-    controlWidgetLay.addWidget(&fileNameExport, 5, 0);
-    controlWidgetLay.addWidget(&exitButton, 6, 0);
+    controlWidgetLay.addWidget(&showOpenFileDialogButton, 0, 0);
+    controlWidgetLay.addWidget(&selectedFileName, 1, 0);
+    controlWidgetLay.addWidget(&importFromFileButton, 2, 0);
+    controlWidgetLay.addWidget(&exportToFileButton, 3, 0);
+    controlWidgetLay.addWidget(&spacer1, 4, 0);
+    controlWidgetLay.addWidget(&processButton, 5, 0);
+    controlWidgetLay.addWidget(&clearButton, 6, 0);
+    controlWidgetLay.addWidget(&spacer2, 7, 0);
+    controlWidgetLay.addWidget(&exitButton, 8, 0);
+    //controlWidgetLay.setAlignment(Qt::AlignTop);
+
     controlWidget.setLayout(&controlWidgetLay);
     controlWidget.setMaximumWidth(200);
 
@@ -30,8 +34,10 @@ MainWidget::MainWidget()
 
     QObject::connect(&clearButton, SIGNAL(clicked()), this, SLOT(clickedClearButton()));
     QObject::connect(&exitButton, SIGNAL(clicked()), this, SLOT(clickedExitButton()));
-    QObject::connect(&exportButton, SIGNAL(clicked()), this, SLOT(clickedExportButton()));
     QObject::connect(&processButton, SIGNAL(clicked()), this, SLOT(clickedProcessButton()));
+    QObject::connect(&showOpenFileDialogButton, SIGNAL(clicked()), &openFile, SLOT(show()));
+    QObject::connect(&openFile, SIGNAL(fileSelected(QString)), &selectedFileName, SLOT(setText(const QString &)));
+    QObject::connect(&exportToFileButton, SIGNAL(clicked()), this, SLOT(clickedExportToFileButton()));
     QObject::connect(&importFromFileButton, SIGNAL(clicked()), this, SLOT(clickedImportFromFileButton()));
     QObject::connect(&visualizer, SIGNAL(pointAdded(Point2D)), this, SLOT(addPoint(Point2D)));
     QObject::connect(&visualizer, SIGNAL(pointRemoved(unsigned int)), this, SLOT(removePoint(unsigned int)));
@@ -57,13 +63,13 @@ void MainWidget::clickedExitButton() {
 }
 
 
-void MainWidget::clickedExportButton() {
-    poly.dumpVertices(fileNameExport.text().toStdString());
+void MainWidget::clickedExportToFileButton() {
+    poly.dumpVertices(selectedFileName.text().toStdString());
 }
 
 
 void MainWidget::clickedImportFromFileButton() {
-    poly = Graph <Point2D> (PolygonInputParser::parseFile(fileNameInput.text().toStdString()));
+    poly = Graph <Point2D> (PolygonInputParser::parseFile(selectedFileName.text().toStdString()));
     poly.connectVertices();
     visualizer.replacePoly(poly);
     visualizer.update();

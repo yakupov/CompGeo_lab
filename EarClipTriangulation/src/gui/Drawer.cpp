@@ -21,10 +21,10 @@ void Drawer::mousePressEvent(QMouseEvent *event) {
         int ptXCoord = (event->x() - offsetx) / scale;
         int ptYCoord = (event->y() - offsety) / scale;
 
-        for (unsigned int i = 0; i < poly.getVertexCount(); ++i) {
-            Point2D curr = poly.getVertex(i);
+        for (int i = poly.getVertexCount() - 1; i >= 0; --i) { //remove newest point, if possible
+            Point2D curr = poly.getVertex((unsigned int)i);
             if (abs(curr.getX() - ptXCoord) < (3 / scale) && abs(curr.getY() - ptYCoord) < (3 / scale)) {
-                emit pointRemoved(i);
+                emit pointRemoved((unsigned int)i);
                 break;
             }
         }

@@ -7,7 +7,9 @@
 #include <QLayout>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QLabel>
 #include <QTabWidget>
+#include <QFileDialog>
 #include "src/algo/PolygonInputParser.h"
 #include "src/algo/EarClipper.h"
 #include "src/gui/Drawer.h"
@@ -21,17 +23,22 @@ protected:
     QTabWidget tabs;
     QWidget controlWidget;
 
+    QFileDialog openFile;
+
     QGridLayout mainLay;
     QGridLayout controlWidgetLay;
 
     QPushButton clearButton;
     QPushButton exitButton;
-    QPushButton exportButton;
+    QPushButton exportToFileButton;
     QPushButton importFromFileButton;
     QPushButton processButton;
+    QPushButton showOpenFileDialogButton;
 
-    QLineEdit fileNameExport;
-    QLineEdit fileNameInput;
+    QLabel spacer1;
+    QLabel spacer2;
+
+    QLineEdit selectedFileName;
 
     Drawer visualizer;
 
@@ -44,7 +51,7 @@ public slots:
     void addPoint (Point2D);
     void clickedClearButton();
     void clickedExitButton();
-    void clickedExportButton();
+    void clickedExportToFileButton();
     void clickedImportFromFileButton();
     void clickedProcessButton();
     void removePoint (unsigned int);
