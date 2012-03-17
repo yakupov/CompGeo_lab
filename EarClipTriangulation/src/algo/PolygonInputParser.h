@@ -18,15 +18,11 @@ public:
             return output;
         }
 
-        while (inp.peek() != EOF) {
-            int x, y;
-            inp >> x >> y;
-
+        int x, y;
+        while (inp >> x >> y) {
             output.push_back(Point2D (x, y));
         }
 
-        output.pop_back();
-        inp.close();
         return output;
     }
 };

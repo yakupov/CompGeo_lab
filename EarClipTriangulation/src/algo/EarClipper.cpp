@@ -63,6 +63,14 @@ Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector 
         }
     }
 
+    if (triangles != 0 && vertexRemaining == 3) {
+        a = findNextVertex(0, cutOff, arg);
+        int b = findNextVertex(a, cutOff, arg);
+        int c = findNextVertex(b, cutOff, arg);
+
+        triangles->push_back(Triangle2D(arg.getVertex(a), arg.getVertex(b), arg.getVertex(c)));
+    }
+
     return result;
 }
 
