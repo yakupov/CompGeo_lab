@@ -11,7 +11,7 @@ public:
 
     Vector2D& operator = (const Vector2D &arg);
 
-    int orientation (const Vector2D &arg);
+    long long orientation (const Vector2D &arg);
 
 protected:
     int x;

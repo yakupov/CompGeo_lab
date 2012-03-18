@@ -58,9 +58,77 @@ Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector 
                                         arg.getVertex(*--remainingVertices.end())));
     }
 
+    if (triangles != 0) {
+        if (validateTriangulation(arg, *triangles)) {
+            std::cout << "Validation OK\n";
+        } else {
+            std::cerr << "Validation failed\n";
+        }
+    }
+
     return result;
 }
 
+
+
+bool EarClipper::validateTriangulation(const Graph<Point2D> &arg, const std::vector<Triangle2D> &triangles) {
+    if (arg.getVertexCount() != triangles.size() + 2) {
+        return false;
+    }
+
+
+    long long polyAreaX2 = 0;
+    long long sumOfTriangleAreasX2 = 0;
+    long long t, t2;
+
+    for (unsigned int i = 0; i < arg.getVertexCount() - 1; ++i) {
+        t = arg.getVertex(i).getX();
+        t *= arg.getVertex(i + 1).getY();
+
+        t2 = arg.getVertex(i + 1).getX();
+        t2 *= arg.getVertex(i).getY();
+
+        polyAreaX2 += (t - t2);
+    }
+    t = arg.getVertex(arg.getVertexCount() - 1).getX();
+    t *= arg.getVertex(0).getY();
+    t2 = arg.getVertex(0).getX();
+    t2 *= arg.getVertex(arg.getVertexCount() - 1).getY();
+    polyAreaX2 += (t - t2);
+    polyAreaX2 = std::abs(polyAreaX2);
+
+
+    for (unsigned int i = 0; i < triangles.size(); ++i) {
+        long long currAreaX2 = 0;
+        t = triangles[i].getA().getX();
+        t *= triangles[i].getB().getY();
+        t2 = triangles[i].getB().getX();
+        t2 *= triangles[i].getA().getY();
+        currAreaX2 += (t - t2);
+
+        t = triangles[i].getB().getX();
+        t *= triangles[i].getC().getY();
+        t2 = triangles[i].getC().getX();
+        t2 *= triangles[i].getB().getY();
+        currAreaX2 += (t - t2);
+
+        t = triangles[i].getC().getX();
+        t *= triangles[i].getA().getY();
+        t2 = triangles[i].getA().getX();
+        t2 *= triangles[i].getC().getY();
+        currAreaX2 += (t - t2);
+
+        sumOfTriangleAreasX2 += std::abs(currAreaX2);
+    }
+
+    if (polyAreaX2 != sumOfTriangleAreasX2) {
+        std::cerr << "Validation failed: " << polyAreaX2 << " != " << sumOfTriangleAreasX2 << std::endl;
+        return false;
+    }
+
+
+    return true;
+}
 
 
 void EarClipper::addTriangle(Graph<Point2D> &poly, const std::list<int>& remainingVertices, std::list<int>::iterator vertex, std::vector<Triangle2D> *triangles) {

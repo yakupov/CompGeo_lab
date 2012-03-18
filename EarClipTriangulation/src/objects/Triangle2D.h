@@ -11,9 +11,11 @@ public:
 
     Triangle2D& operator = (const Triangle2D&);
 
-    Point2D getA() {return a;}
-    Point2D getB() {return b;}
-    Point2D getC() {return c;}
+    Point2D getA() const {return a;}
+    Point2D getB() const {return b;}
+    Point2D getC() const {return c;}
+
+    bool hasCommonEdge (const Triangle2D * arg) const;
 
 protected:
     Point2D a;

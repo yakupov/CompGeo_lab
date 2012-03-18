@@ -26,6 +26,13 @@ Vector2D& Vector2D::operator = (const Vector2D &arg) {
 }
 
 
-int Vector2D::orientation(const Vector2D &arg) {
-    return x * arg.y - y * arg.x;
+long long Vector2D::orientation(const Vector2D &arg) {
+    long long res = x;
+    res *= arg.y;
+
+    long long t = y;
+    t *= arg.x;
+
+    res -= t;
+    return res;
 }

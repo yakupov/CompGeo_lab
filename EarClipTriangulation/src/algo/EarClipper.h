@@ -15,6 +15,7 @@
 class EarClipper {
 public:
     static Graph <Point2D> triangulate (const Graph <Point2D> &arg, std::vector <Triangle2D> *triangles = 0);
+    static bool validateTriangulation (const Graph <Point2D> &arg, const std::vector <Triangle2D> &triangles);
 
 private:
     static void addTriangle (Graph<Point2D> &poly, const std::list<int> &remainingVertices, std::list<int>::iterator vertex, std::vector <Triangle2D> *triangles = 0);
