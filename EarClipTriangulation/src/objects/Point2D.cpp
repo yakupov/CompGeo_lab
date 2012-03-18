@@ -38,3 +38,14 @@ Point2D& Point2D::operator -= (const Point2D &arg) {
 
     return *this;
 }
+
+
+bool Point2D::operator < (const Point2D &arg) {
+    if (this->x < arg.x) {
+        return true;
+    }
+    if (this->x > arg.x) {
+        return false;
+    }
+    return (this->y < arg.y);
+}

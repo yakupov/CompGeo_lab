@@ -2,93 +2,159 @@
 
 Graph <Point2D> EarClipper::triangulate(const Graph <Point2D> &arg, std::vector <Triangle2D> *triangles) {
     Graph <Point2D> result (arg);
-    std::vector<bool> cutOff (arg.getVertexCount(), false);
-    int vertexRemaining = arg.getVertexCount();
+    std::vector<bool> vertexStatus (arg.getVertexCount(), false); //1 - ear, 0 - not ear
+    std::list<int> remainingVertices;
+    short direction = determineDirection(arg);
 
-    unsigned long long stepsElapsed = 0;
-    short direction = 1;
-    unsigned int a = 0; //first of three vertexes, which create a corner
+    for (unsigned int i = 0; i < arg.getVertexCount(); ++i) {
+        remainingVertices.push_back(i);
+    }
 
-    while (vertexRemaining > 3) {
-        if (++stepsElapsed > arg.getVertexCount() * arg.getVertexCount()) {
+    for (std::list<int>::iterator it = remainingVertices.begin(); it != remainingVertices.end(); ++it) {
+        vertexStatus[*it] = isEar(arg, remainingVertices, it, direction);
+    }
+
+    std::list<int>::iterator currentVertex = remainingVertices.begin();
+    while (remainingVertices.size() > 3) {
+        bool earFound = false;
+
+        for (unsigned int i = remainingVertices.size(); i > 0 && remainingVertices.size() > 3; --i) {
+            if (vertexStatus[*currentVertex] == 1) {
+                earFound = true;
+                addTriangle(result, remainingVertices, currentVertex, triangles);
+
+                std::list<int>::iterator vertexToRemove = currentVertex;
+
+                if (++currentVertex == remainingVertices.end()) {
+                    currentVertex = remainingVertices.begin();
+                }
+                remainingVertices.erase(vertexToRemove);
+                vertexStatus[*currentVertex] = isEar(arg, remainingVertices, currentVertex, direction);
+
+                if (currentVertex == remainingVertices.begin()) {
+                    currentVertex = --remainingVertices.end();
+                } else {
+                    --currentVertex;
+                }
+                vertexStatus[*currentVertex] = isEar(arg, remainingVertices, currentVertex, direction);
+            } else {
+                if (++currentVertex == remainingVertices.end()) {
+                    currentVertex = remainingVertices.begin();
+                }
+            }
+        }
+
+        if (!earFound) {
             result.connectVertices();
             triangles->clear();
 
-            if (direction == -1) {
-                std::cerr << "Impossoble to triangulate\n";
-                return result;
-            } else {
-                direction = -1;
-                stepsElapsed = 0;
-                a = 0;
-                cutOff.assign(arg.getVertexCount(), false);
-                vertexRemaining = arg.getVertexCount();
-            }
-        }
-
-        bool isEar = true;
-        unsigned int b = findNextVertex(a, cutOff, arg);
-        unsigned int c = findNextVertex(b, cutOff, arg);
-
-        Vector2D va(arg.getVertex(a), arg.getVertex(b));
-        Vector2D vb(arg.getVertex(b), arg.getVertex(c));
-
-        if (va.orientation(vb) * direction > 0) {
-            a = findNextVertex(a, cutOff, arg);
-            continue;
-        }
-
-        for (unsigned int i = 0; i < arg.getVertexCount(); ++i) {
-            if (i == a || i == b || i == c || cutOff[i]) {
-                continue;
-            }
-
-            if (isInsideOfTriangle(arg.getVertex(b), arg.getVertex(a), arg.getVertex(c), arg.getVertex(i))) {
-                isEar = false;
-                //std::cout << a << ' ' << b << ' ' << c << ' ' << i << " - not ear\n";
-                break;
-            }
-        }
-
-        if (isEar) {
-            --vertexRemaining;
-            cutOff[b] = true;
-            result.addEdge(a, c);
-            if (triangles != 0) {
-                triangles->push_back(Triangle2D(arg.getVertex(a), arg.getVertex(b), arg.getVertex(c)));
-            }
-            //std::cout << a << ' ' << c << " - edge added\n";
-        } else {
-            a = findNextVertex(a, cutOff, arg);
+            std::cerr << "Impossoble to triangulate\n";
+            return result;
         }
     }
 
-    if (triangles != 0 && vertexRemaining == 3) {
-        a = findNextVertex(0, cutOff, arg);
-        int b = findNextVertex(a, cutOff, arg);
-        int c = findNextVertex(b, cutOff, arg);
-
-        triangles->push_back(Triangle2D(arg.getVertex(a), arg.getVertex(b), arg.getVertex(c)));
+    if (triangles != 0 && remainingVertices.size() == 3) { //add remains to triangulation
+        triangles->push_back(Triangle2D(arg.getVertex(*remainingVertices.begin()), arg.getVertex(*++remainingVertices.begin()),
+                                        arg.getVertex(*--remainingVertices.end())));
     }
 
     return result;
 }
 
 
-//cutOff - map, which shows, which vertices can not be valid answer
-unsigned int EarClipper::findNextVertex(unsigned int curr, const std::vector<bool> &cutOff, const Graph<Point2D> &poly) {
-    int res = curr + 1;
-    res %= poly.getVertexCount(); //cycle vertices
 
-    int triesRemaining = poly.getVertexCount() + 2;
-    while (cutOff[res]) {
-        assert (--triesRemaining > 0);
+void EarClipper::addTriangle(Graph<Point2D> &poly, const std::list<int>& remainingVertices, std::list<int>::iterator vertex, std::vector<Triangle2D> *triangles) {
+    assert (remainingVertices.size() > 2);
+    unsigned int a, b, c;
 
-        ++res;
-        res %= poly.getVertexCount();
+    b = *vertex;
+    if (vertex == remainingVertices.begin()) {
+        a = remainingVertices.back();
+        c = *++vertex;
+        --vertex;
+    } else if (vertex == --remainingVertices.end()) {
+        a = *--vertex;
+        c = remainingVertices.front();
+        ++vertex;
+    } else {
+        a = *--vertex;
+        c = *++++vertex;
     }
 
-    return res;
+    assert (a < poly.getVertexCount() && b < poly.getVertexCount() && c < poly.getVertexCount());
+
+    poly.addEdge(a, c);
+    std::cout << "Edge added: " << a << ' ' << c << ", ear clipped: " << b << std::endl;
+    if (triangles != 0) {
+        triangles->push_back(Triangle2D(poly.getVertex(a), poly.getVertex(b), poly.getVertex(c)));
+    }
+}
+
+
+short EarClipper::determineDirection(const Graph<Point2D> &poly) {
+    if (poly.getVertexCount() < 3) {
+        return 1;
+    }
+
+    int minVertex = 0;
+    for (unsigned int i = 0; i < poly.getVertexCount(); ++i) {
+        if (poly.getVertex(i) < poly.getVertex(minVertex)) {
+            minVertex = (int) i;
+        }
+    }
+    int minVertexLeft = minVertex - 1;
+    if (minVertexLeft < 0) {
+        minVertexLeft = (int) poly.getVertexCount() - 1;
+    }
+    int minVertexRight = (minVertex + 1) % (int) poly.getVertexCount();
+
+    Vector2D vMV1 (poly.getVertex(minVertexLeft), poly.getVertex(minVertex));
+    Vector2D vMV2 (poly.getVertex(minVertex), poly.getVertex(minVertexRight));
+    if (vMV1.orientation(vMV2) > 0) {
+        return -1;
+    }
+    return 1;
+}
+
+
+bool EarClipper::isEar(const Graph<Point2D> &poly, std::list<int>& remainingVertices, std::list<int>::iterator vertex, short direction) {
+    assert (remainingVertices.size() > 2);
+    unsigned int a, b, c;
+
+    b = *vertex;
+    if (vertex == remainingVertices.begin()) {
+        a = remainingVertices.back();
+        c = *++vertex;
+        --vertex;
+    } else if (vertex == --remainingVertices.end()) {
+        a = *--vertex;
+        c = remainingVertices.front();
+        ++vertex;
+    } else {
+        a = *--vertex;
+        c = *++++vertex;
+    }
+
+    assert (a < poly.getVertexCount() && b < poly.getVertexCount() && c < poly.getVertexCount());
+
+    Vector2D va (poly.getVertex(a), poly.getVertex(b));
+    Vector2D vb (poly.getVertex(b), poly.getVertex(c));
+    if (va.orientation(vb) * direction > 0) {
+        return false;
+    }
+
+    for (std::list<int>::iterator it = remainingVertices.begin(); it != remainingVertices.end(); ++it) {
+        if (*it == (int)a || *it == (int)b || *it == (int)c) {
+            continue;
+        }
+
+        if (isInsideOfTriangle(poly.getVertex(a), poly.getVertex(b), poly.getVertex(c), poly.getVertex(*it))) {
+            return false;
+        }
+    }
+
+    std::cout << a << ' ' << b << ' ' << c << " - ear\n";
+    return true;
 }
 
 
