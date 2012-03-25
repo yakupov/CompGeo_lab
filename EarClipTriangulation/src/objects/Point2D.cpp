@@ -49,3 +49,9 @@ bool Point2D::operator < (const Point2D &arg) {
     }
     return (this->y < arg.y);
 }
+
+
+bool Point2D::operator == (const Point2D &arg) {
+    return (this->x == arg.x && this->y == arg.y);
+}
+

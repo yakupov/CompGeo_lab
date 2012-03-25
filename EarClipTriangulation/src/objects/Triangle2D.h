@@ -15,7 +15,7 @@ public:
     Point2D getB() const {return b;}
     Point2D getC() const {return c;}
 
-    bool hasCommonEdge (const Triangle2D * arg) const;
+    bool hasCommonEdge (const Triangle2D &arg);
 
 protected:
     Point2D a;
